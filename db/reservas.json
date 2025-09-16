@@ -1,0 +1,20 @@
+{
+  "reservas": [
+    {
+      "id": "1",
+      "usuarioId": "4",
+      "libroId": "5",
+      "fechaReserva": "2024-03-01",
+      "fechaExpiracion": "2024-03-08",
+      "estado": "activa"
+    },
+    {
+      "id": "2",
+      "usuarioId": "2",
+      "libroId": "1",
+      "fechaReserva": "2024-03-03",
+      "fechaExpiracion": "2024-03-10",
+      "estado": "activa"
+    }
+  ]
+}

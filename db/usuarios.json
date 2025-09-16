@@ -1,0 +1,49 @@
+{
+  "usuarios": [
+    {
+      "id": "1",
+      "nombre": "Juan Pérez",
+      "correo": "juan.perez@universidad.edu",
+      "contraseña": "hashed_password_123",
+      "tipo": "estudiante",
+      "fechaRegistro": "2024-01-15",
+      "activo": true
+    },
+    {
+      "id": "2",
+      "nombre": "María García",
+      "correo": "maria.garcia@universidad.edu",
+      "contraseña": "hashed_password_456",
+      "tipo": "docente",
+      "fechaRegistro": "2024-01-10",
+      "activo": true
+    },
+    {
+      "id": "3",
+      "nombre": "Carlos López",
+      "correo": "carlos.lopez@universidad.edu",
+      "contraseña": "hashed_password_789",
+      "tipo": "bibliotecario",
+      "fechaRegistro": "2024-01-05",
+      "activo": true
+    },
+    {
+      "id": "4",
+      "nombre": "Ana Martínez",
+      "correo": "ana.martinez@universidad.edu",
+      "contraseña": "hashed_password_101",
+      "tipo": "estudiante",
+      "fechaRegistro": "2024-02-01",
+      "activo": true
+    },
+    {
+      "id": "5",
+      "nombre": "Roberto Silva",
+      "correo": "roberto.silva@universidad.edu",
+      "contraseña": "hashed_password_202",
+      "tipo": "docente",
+      "fechaRegistro": "2024-01-20",
+      "activo": false
+    }
+  ]
+}
