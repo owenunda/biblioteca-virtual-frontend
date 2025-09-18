@@ -4,7 +4,7 @@
  */
 "use client";
 import { useState, useEffect, createContext, useContext } from "react";
-import { db } from "@/lib/database";
+const API_URL = "https://biblioteca-virtual-backend-production-25d1.up.railway.app";
 // Crear el contexto de autenticación
 const AuthContext = createContext(undefined);
 // Proveedor del contexto de autenticación
@@ -26,44 +26,49 @@ export function AuthProvider({ children }) {
         setIsLoading(false);
     }, []);
     // Función para iniciar sesión
-    const login = async (correo, contraseña) => {
-        try {
-            const usuarioAutenticado = db.autenticarUsuario(correo, contraseña);
-            if (usuarioAutenticado) {
-                setUsuario(usuarioAutenticado);
-                localStorage.setItem("usuario", JSON.stringify(usuarioAutenticado));
-                return true;
+        const login = async (email, password) => {
+            try {
+                const res = await fetch(`${API_URL}/users/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+                if (!res.ok) return false;
+                const usuarioAutenticado = await res.json();
+                if (usuarioAutenticado) {
+                    setUsuario(usuarioAutenticado);
+                    localStorage.setItem("usuario", JSON.stringify(usuarioAutenticado));
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error("Error en login:", error);
+                return false;
             }
-            return false;
-        }
-        catch (error) {
-            console.error("Error en login:", error);
-            return false;
-        }
-    };
+        };
     // Función para cerrar sesión
     const logout = () => {
         setUsuario(null);
         localStorage.removeItem("usuario");
     };
     // Función para registrar nuevo usuario
-    const register = async (datos) => {
-        try {
-            // Verificar si el correo ya existe
-            const usuarioExistente = db.getUsuarioPorCorreo(datos.correo);
-            if (usuarioExistente) {
-                return null; // Usuario ya existe
+        const register = async (datos) => {
+            try {
+                const res = await fetch(`${API_URL}/users`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(datos)
+                });
+                if (!res.ok) return null;
+                const nuevoUsuario = await res.json();
+                setUsuario(nuevoUsuario);
+                localStorage.setItem("usuario", JSON.stringify(nuevoUsuario));
+                return nuevoUsuario;
+            } catch (error) {
+                console.error("Error en registro:", error);
+                return null;
             }
-            const nuevoUsuario = db.registrarUsuario(datos);
-            setUsuario(nuevoUsuario);
-            localStorage.setItem("usuario", JSON.stringify(nuevoUsuario));
-            return nuevoUsuario;
-        }
-        catch (error) {
-            console.error("Error en registro:", error);
-            return null;
-        }
-    };
+        };
     const value = {
         usuario,
         isLoading,

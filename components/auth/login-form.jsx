@@ -12,11 +12,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { BookOpen } from "lucide-react";
 export function LoginForm({ onToggleMode }) {
+
+
     const [correo, setCorreo] = useState("");
     const [contraseña, setContraseña] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const { login } = useAuth();
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
