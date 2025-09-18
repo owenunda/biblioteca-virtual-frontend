@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { BookOpen, Users, FileText, BarChart3, User, LogOut } from "lucide-react";
 export function Navbar() {
-    const { usuario, logout } = useAuth();
+  const { usuario, logout } = useAuth();
+
+
     return (<nav className="bg-primary text-primary-foreground shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
@@ -22,46 +24,55 @@ export function Navbar() {
           </div>
 
           {/* Menú de navegación */}
-          {usuario && (<div className="flex items-center space-x-4">
+          {usuario && (
+            <div className="flex items-center space-x-4">
               <Link href="/catalogo" className="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/80 transition-colors">
-                <BookOpen className="h-4 w-4 mr-2"/>
+                <BookOpen className="h-4 w-4 mr-2" />
                 Catálogo
               </Link>
 
               <Link href="/prestamos" className="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/80 transition-colors">
-                <FileText className="h-4 w-4 mr-2"/>
+                <FileText className="h-4 w-4 mr-2" />
                 Préstamos
               </Link>
 
               {/* Menú solo para bibliotecarios */}
-              {usuario.tipo === "bibliotecario" && (<>
+              {usuario?.role === "BIBLIOTECARIO" && (
+                <>
                   <Link href="/usuarios" className="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/80 transition-colors">
-                    <Users className="h-4 w-4 mr-2"/>
+                    <Users className="h-4 w-4 mr-2" />
                     Usuarios
                   </Link>
 
                   <Link href="/reportes" className="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/80 transition-colors">
-                    <BarChart3 className="h-4 w-4 mr-2"/>
+                    <BarChart3 className="h-4 w-4 mr-2" />
                     Reportes
                   </Link>
-                </>)}
+                </>
+              )}
 
               {/* Menú de usuario */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary/80">
-                    <User className="h-4 w-4 mr-2"/>
-                    {usuario.nombre}
+                    <User className="h-4 w-4 mr-2" />
+                    {usuario?.name}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <div className="px-4 py-2 text-xs text-muted-foreground">
+                    <div><span className="font-semibold">Nombre:</span> {usuario?.name}</div>
+                    <div><span className="font-semibold">Correo:</span> {usuario?.email}</div>
+                    <div><span className="font-semibold">Rol:</span> {usuario?.role}</div>
+                  </div>
                   <DropdownMenuItem onClick={logout}>
-                    <LogOut className="h-4 w-4 mr-2"/>
+                    <LogOut className="h-4 w-4 mr-2" />
                     Cerrar Sesión
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>)}
+            </div>
+          )}
         </div>
       </div>
     </nav>);

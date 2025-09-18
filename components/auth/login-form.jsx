@@ -78,13 +78,13 @@ export function LoginForm({ onToggleMode }) {
           <p className="text-sm font-medium mb-2">Credenciales de prueba:</p>
           <div className="text-xs space-y-1">
             <p>
-              <strong>Estudiante:</strong> juan.perez@universidad.edu / hashed_password_123
+              <strong>Estudiante:</strong> juliana@example.com / 2210
             </p>
             <p>
-              <strong>Docente:</strong> maria.garcia@universidad.edu / hashed_password_456
+              <strong>Docente:</strong> martha@gmail.com / 123456
             </p>
             <p>
-              <strong>Bibliotecario:</strong> carlos.lopez@universidad.edu / hashed_password_789
+              <strong>Bibliotecario:</strong> jaison@gmail.com / 123456
             </p>
           </div>
         </div>

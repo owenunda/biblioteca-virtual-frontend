@@ -9,51 +9,58 @@ const API_URL = "https://biblioteca-virtual-backend-production-25d1.up.railway.a
 const AuthContext = createContext(undefined);
 // Proveedor del contexto de autenticación
 export function AuthProvider({ children }) {
+
     const [usuario, setUsuario] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     // Cargar usuario desde localStorage al inicializar
     useEffect(() => {
         const usuarioGuardado = localStorage.getItem("usuario");
-        if (usuarioGuardado) {
+        const tokenGuardado = localStorage.getItem("access_token");
+        if (usuarioGuardado && tokenGuardado) {
             try {
                 setUsuario(JSON.parse(usuarioGuardado));
-            }
-            catch (error) {
+            } catch (error) {
                 console.error("Error al cargar usuario:", error);
                 localStorage.removeItem("usuario");
+                localStorage.removeItem("access_token");
             }
         }
         setIsLoading(false);
     }, []);
     // Función para iniciar sesión
-        const login = async (email, password) => {
-            try {
-                const res = await fetch(`${API_URL}/users/login`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password })
-                });
-                if (!res.ok) return false;
-                const usuarioAutenticado = await res.json();
-                if (usuarioAutenticado) {
-                    setUsuario(usuarioAutenticado);
-                    localStorage.setItem("usuario", JSON.stringify(usuarioAutenticado));
-                    return true;
-                }
-                return false;
-            } catch (error) {
-                console.error("Error en login:", error);
-                return false;
+    const login = async (email, password) => {
+        try {
+            const res = await fetch(`${API_URL}/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+            if (!res.ok) return false;
+            const data = await res.json();
+            // Espera: { access_token, user: { name, email, role } }
+            if (data && data.access_token && data.user) {
+                // Guardar token y usuario por separado
+                localStorage.setItem("access_token", data.access_token);
+                localStorage.setItem("usuario", JSON.stringify(data.user));
+                setUsuario(data.user);
+                return true;
             }
-        };
+            return false;
+        } catch (error) {
+            console.error("Error en login:", error);
+            return false;
+        }
+    };
     // Función para cerrar sesión
     const logout = () => {
-        setUsuario(null);
-        localStorage.removeItem("usuario");
+    setUsuario(null);
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("access_token");
     };
     // Función para registrar nuevo usuario
         const register = async (datos) => {
             try {
+                console.log(datos);
                 const res = await fetch(`${API_URL}/users`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
