@@ -15,15 +15,17 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { BookOpen, FileText, Users, BarChart3 } from "lucide-react";
 export default function HomePage() {
-    const { usuario, isLoading } = useAuth();
-    const [isLoginMode, setIsLoginMode] = useState(true);
-    const [estadisticas, setEstadisticas] = useState(null);
+  const { usuario, isLoading } = useAuth();
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [estadisticas, setEstadisticas] = useState(null);
+  const [totalUsuarios, setTotalUsuarios] = useState(null);
     // Cargar estadísticas cuando el usuario esté autenticado
   useEffect(() => {
     async function fetchStats() {
       if (!usuario) return;
       const API_URL = "https://biblioteca-virtual-backend-production-25d1.up.railway.app";
-      const res = await fetch(`${API_URL}/stats`, {
+      // Estadísticas generales
+      const res = await fetch(`${API_URL}/prestamos/stats`, {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('access_token')}`
         }
@@ -31,6 +33,16 @@ export default function HomePage() {
       if (res.ok) {
         const stats = await res.json();
         setEstadisticas(stats);
+      }
+      // Usuarios activos
+      const resUsuarios = await fetch(`${API_URL}/users`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('access_token')}`
+        }
+      });
+      if (resUsuarios.ok) {
+        const usuarios = await resUsuarios.json();
+        setTotalUsuarios(Array.isArray(usuarios) ? usuarios.length : null);
       }
     }
     fetchStats();
@@ -66,9 +78,82 @@ export default function HomePage() {
         </div>
 
         {/* Tarjetas de estadísticas */}
-        {estadisticas && (<div className="mb-8">
-            <StatsCards estadisticas={estadisticas}/>
-          </div>)}
+        {estadisticas && (
+          <div className="mb-8">
+            <StatsCards estadisticas={{
+              ...estadisticas,
+              totalUsuarios: totalUsuarios ?? 0
+            }}/>
+          </div>
+        )}
+
+        {/* Estadísticas avanzadas */}
+        {estadisticas && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {/* Libros más prestados */}
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <BookOpen className="h-5 w-5 mr-2 text-primary" />
+                  Libros más prestados
+                </CardTitle>
+                <CardDescription>Top 5 libros con más préstamos</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-1">
+                  {estadisticas.librosMasPrestados?.slice(0, 5).map((libro, idx) => (
+                    <li key={idx} className="flex justify-between text-sm">
+                      <span className="font-medium">{libro.titulo}</span>
+                      <span className="text-muted-foreground">{libro.vecesPrestado} veces</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Usuarios top */}
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Users className="h-5 w-5 mr-2 text-primary" />
+                  Usuarios con más préstamos
+                </CardTitle>
+                <CardDescription>Top usuarios por cantidad de préstamos</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-1">
+                  {estadisticas.usuariosTop?.map((usuario, idx) => (
+                    <li key={idx} className="flex justify-between text-sm">
+                      <span className="font-medium">{usuario.nombre}</span>
+                      <span className="text-muted-foreground">{usuario.prestamos} préstamos</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Préstamos por mes */}
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <BarChart3 className="h-5 w-5 mr-2 text-primary" />
+                  Préstamos por mes
+                </CardTitle>
+                <CardDescription>Actividad mensual de préstamos</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-1">
+                  {estadisticas.prestamosPorMes?.map((mes, idx) => (
+                    <li key={idx} className="flex justify-between text-sm">
+                      <span className="font-medium">{mes.mes}</span>
+                      <span className="text-muted-foreground">{mes.cantidad} préstamos</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Accesos rápidos */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

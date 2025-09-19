@@ -44,11 +44,6 @@ export function Navbar() {
                     <Users className="h-4 w-4 mr-2" />
                     Usuarios
                   </Link>
-
-                  <Link href="/reportes" className="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/80 transition-colors">
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    Reportes
-                  </Link>
                 </>
               )}
 
