@@ -11,7 +11,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { db } from "@/lib/database";
+// import { db } from "@/lib/database";
 import Link from "next/link";
 import { BookOpen, FileText, Users, BarChart3 } from "lucide-react";
 export default function HomePage() {
@@ -19,12 +19,22 @@ export default function HomePage() {
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [estadisticas, setEstadisticas] = useState(null);
     // Cargar estadísticas cuando el usuario esté autenticado
-    useEffect(() => {
-        if (usuario) {
-            const stats = db.getEstadisticas();
-            setEstadisticas(stats);
+  useEffect(() => {
+    async function fetchStats() {
+      if (!usuario) return;
+      const API_URL = "https://biblioteca-virtual-backend-production-25d1.up.railway.app";
+      const res = await fetch(`${API_URL}/stats`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('access_token')}`
         }
-    }, [usuario]);
+      });
+      if (res.ok) {
+        const stats = await res.json();
+        setEstadisticas(stats);
+      }
+    }
+    fetchStats();
+  }, [usuario]);
     // Mostrar loading mientras se verifica la autenticación
     if (isLoading) {
         return (<div className="min-h-screen flex items-center justify-center">

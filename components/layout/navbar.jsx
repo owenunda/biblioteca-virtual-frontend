@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { BookOpen, Users, FileText, BarChart3, User, LogOut } from "lucide-react";
 export function Navbar() {
   const { usuario, logout } = useAuth();
+  console.log('Navbar usuario:', usuario);
 
 
     return (<nav className="bg-primary text-primary-foreground shadow-lg">

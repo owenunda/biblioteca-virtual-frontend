@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { db } from "@/lib/database";
+// import { db } from "@/lib/database";
 import { Search, Filter, BookOpen } from "lucide-react";
 export default function CatalogoPage() {
     const { usuario } = useAuth();
@@ -22,30 +22,56 @@ export default function CatalogoPage() {
     const [estadoFiltro, setEstadoFiltro] = useState("all");
     const [categorias, setCategorias] = useState([]);
     // Cargar datos iniciales
-    useEffect(() => {
-        const todosLosLibros = db.getLibros();
-        const todasLasCategorias = db.getCategorias();
-        setLibros(todosLosLibros);
-        setLibrosFiltrados(todosLosLibros);
-        setCategorias(todasLasCategorias);
-    }, []);
+  useEffect(() => {
+    async function fetchLibros() {
+      const API_URL = "https://biblioteca-virtual-backend-production-25d1.up.railway.app";
+      const res = await fetch(`${API_URL}/books`);
+      if (res.ok) {
+        const data = await res.json();
+        // Adaptar los datos a la estructura esperada por el frontend
+        const adaptados = data.map(libro => ({
+          id: libro.book_id,
+          titulo: libro.title,
+          categoria: libro.category,
+          estado: libro.estado,
+          autor: libro.autor || "Autor desconocido",
+          editorial: libro.editorial || "",
+          isbn: libro.isbn || "",
+          fechaPublicacion: libro.fechaPublicacion || "",
+          copias: libro.copias || 1,
+          copiasDisponibles: libro.copiasDisponibles || 1
+        }));
+        setLibros(adaptados);
+        setLibrosFiltrados(adaptados);
+        // Extraer categorías únicas
+        const categoriasUnicas = [...new Set(adaptados.map((libro) => libro.categoria))];
+        setCategorias(categoriasUnicas);
+      }
+    }
+    fetchLibros();
+  }, []);
     // Aplicar filtros cuando cambien los criterios de búsqueda
-    useEffect(() => {
-        let resultado = libros;
-        // Filtro por búsqueda de texto
-        if (busqueda.trim()) {
-            resultado = db.buscarLibros(busqueda);
-        }
-        // Filtro por categoría
-        if (categoriaFiltro !== "all") {
-            resultado = resultado.filter((libro) => libro.categoria === categoriaFiltro);
-        }
-        // Filtro por estado
-        if (estadoFiltro !== "all") {
-            resultado = resultado.filter((libro) => libro.estado === estadoFiltro);
-        }
-        setLibrosFiltrados(resultado);
-    }, [busqueda, categoriaFiltro, estadoFiltro, libros]);
+  useEffect(() => {
+    let resultado = libros;
+    // Filtro por búsqueda de texto
+    if (busqueda.trim()) {
+      const terminoLower = busqueda.toLowerCase();
+      resultado = resultado.filter((libro) =>
+        libro.titulo.toLowerCase().includes(terminoLower) ||
+        libro.autor.toLowerCase().includes(terminoLower) ||
+        libro.categoria.toLowerCase().includes(terminoLower)
+      );
+    }
+    // Filtro por categoría
+    if (categoriaFiltro !== "all") {
+      resultado = resultado.filter((libro) => libro.categoria === categoriaFiltro);
+    }
+    // Filtro por estado
+    if (estadoFiltro !== "all") {
+      resultado = resultado.filter((libro) => libro.estado === estadoFiltro);
+    }
+    setLibrosFiltrados(resultado);
+  }, [busqueda, categoriaFiltro, estadoFiltro, libros]);
     // Limpiar filtros
     const limpiarFiltros = () => {
         setBusqueda("");
@@ -53,10 +79,26 @@ export default function CatalogoPage() {
         setEstadoFiltro("all");
     };
     // Actualizar lista después de acciones
-    const handleUpdate = () => {
-        const todosLosLibros = db.getLibros();
-        setLibros(todosLosLibros);
-    };
+  const handleUpdate = async () => {
+    const API_URL = "https://biblioteca-virtual-backend-production-25d1.up.railway.app";
+    const res = await fetch(`${API_URL}/books`);
+    if (res.ok) {
+      const data = await res.json();
+      const adaptados = data.map(libro => ({
+        id: libro.book_id,
+        titulo: libro.title,
+        categoria: libro.category,
+        estado: libro.estado,
+        autor: libro.autor || "Autor desconocido",
+        editorial: libro.editorial || "",
+        isbn: libro.isbn || "",
+        fechaPublicacion: libro.fechaPublicacion || "",
+        copias: libro.copias || 1,
+        copiasDisponibles: libro.copiasDisponibles || 1
+      }));
+      setLibros(adaptados);
+    }
+  };
     // Redirigir si no está autenticado
     if (!usuario) {
         return (<div className="min-h-screen flex items-center justify-center">
